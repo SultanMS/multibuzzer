@@ -31,7 +31,7 @@ export default function Table(game) {
       setSoundPlayed(true);
     }
   };
-
+// eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     console.log(game.G.queue, Date.now());
     // reset buzzer based on game
