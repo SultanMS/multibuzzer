@@ -64,3 +64,11 @@ jobs:
           slot-name: 'Production'
           package: .
           
+      - name: npm install, build, and test
+        env:
+          CI: false
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+          
