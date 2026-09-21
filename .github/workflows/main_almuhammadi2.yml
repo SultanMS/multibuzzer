@@ -1,4 +1,4 @@
-    # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy Node.js app to Azure Web App - almuhammadi2
@@ -12,26 +12,33 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      CI: false
     permissions:
       contents: read
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.12.2'
+          node-version: '20.x'
 
-      - name: npm install and build
-        run: |
-          npm install
-          npm run build --if-present
+      - name: Install deps (no audit noise)
+        env:
+          NPM_CONFIG_AUDIT: "false"
+        run: npm ci || npm install
+
+      - name: Build app (ignore ESLint warnings)
+        env:
+          CI: false
+        run: npm run build --if-present
+
+      # If you keep tests but have none, make them pass:
+      - name: Test (pass with no tests)
+        run: npm test -- --watchAll=false --passWithNoTests
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: .
@@ -45,22 +52,20 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
       - name: Login to Azure
-        uses: azure/login@v3
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4C62F1595E8B40D68A79D406A6FF67A9 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_074DE8EFFDF34E1CAD94A46D39176DF6 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1811BD2B1867467E9DC3EACE3B7ADD28 }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'almuhammadi2'
           slot-name: 'Production'
           package: .
-          
