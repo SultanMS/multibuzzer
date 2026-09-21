@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '20.12.2'
-      - name: npm install, build, and test
+      - name: npm install, build
         env:
           CI: false          # <-- ADDED HERE, in the existing build step
         run: |
